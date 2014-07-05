@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sat Jul  5 16:28:05 2014 vaur
+## Last update Sat Jul  5 19:17:07 2014 vaur
 ##
 
 ########################################################################
@@ -24,12 +24,13 @@ SRC=			call.c			\
 			call_rm_0xD.c		\
 			main.c			\
 			parse.c			\
+			parse_elf.c		\
 			ret.c			\
 			sib.c			\
 			syscall.c		\
 			trace.c			\
 			trace_get_infos.c	\
-
+			xmalloc.c
 
 ##################
 ## 	Author
