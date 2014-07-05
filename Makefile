@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sat Jul  5 19:17:07 2014 vaur
+## Last update Sat Jul  5 19:42:46 2014 vaur
 ##
 
 ########################################################################
@@ -50,7 +50,7 @@ INFO=			NO
 ## 	Flags
 
 CFLAGS +=		-Iinclude
-LDFLAGS +=
+LDFLAGS +=		-lelf -L./libelf
 
 ##################
 ## Directories
