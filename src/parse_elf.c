@@ -5,7 +5,7 @@
 ** Login   <vaur@epitech.net>
 **
 ** Started on  Sat Jul  5 18:43:13 2014 vaur
-** Last update Sat Jul  5 19:32:36 2014 vaur
+** Last update Sat Jul  5 20:15:22 2014 vaur
 */
 
 /*
@@ -16,9 +16,15 @@
 # include	<unistd.h>
 #endif
 
+#include	<fcntl.h>
+#include	<errno.h>
+#include	<libelf.h>
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<sys/types.h>
+#include	<sys/stat.h>
+
 #include	"parse_elf.h"
 #include	"parse_elf_internal.h"
 #include	"xfcts.h"
@@ -35,23 +41,38 @@ inline static void	display_msg(const char *msg)
 
 static char	*get_prog_path(int pid)
 {
+  char		path_link[100];
   char		path[100];
 
-  sprintf(path, "%s%d/exec", PROC_PATH, pid);
+  sprintf(path_link, "%s%d/exe", PROC_PATH, pid);
+  if (readlink(path_link, path, strlen(path_link)) == -1)
+    {
+      fprintf(stderr, "readlink \"%s\": %s\n", path_link, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+  printf("path_link: %s\n", path_link);
   return (strdup(path));
 }
 
-/* static void	read_file(const char *prog_path) */
-/* { */
-/*   int		fd; */
+static Elf*	open_elf(const char* filename)
+{
+  int		fd;
+  Elf*		elf;
 
-/*   if((fd = open(prog_path, O_RDONLY)) == -1) */
-/*     { */
-/*       printf("couldnt open %s\n", prog_path); */
-/*       exit(EXIT_FAILURE); */
-/*     } */
-/*   close(fd); */
-/* } */
+  elf_version(EV_CURRENT);
+  if((fd = open(filename, O_RDONLY)) == -1)
+    {
+      fprintf(stderr, "open %s: %s", filename, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+  if (!(elf = elf_begin(fd, ELF_C_READ, NULL)))
+    {
+      fprintf(stderr, "elf_begin %s: %s (%d)", filename, elf_errmsg(elf_errno()), elf_errno());
+      exit(EXIT_FAILURE);
+    }
+  close(fd);
+  return (elf);
+}
 
 /*
 ** Public Functions
@@ -60,14 +81,14 @@ static char	*get_prog_path(int pid)
 void	parse_elf(int pid)
 {
   char	*prog_path;
-
-  (void)pid;
+  Elf	*elf;
 
   display_msg("parsing elf");
   prog_path = get_prog_path(pid);
   printf("\"%s\"\n", prog_path);
-  /* parse_file(prog_path); */
+  elf = open_elf(prog_path);
 
+  elf_end(elf);
   free(prog_path);
 
 #if DEBUG_ == 1
