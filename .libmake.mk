@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ##
 ## Started on  Mon Jun  9 18:04:08 2014 vaur
-## Last update Sat Jul  5 16:28:03 2014 vaur
+## Last update Sat Jul  5 16:32:30 2014 vaur
 ##
 
 ############################
@@ -20,11 +20,11 @@ RM=			rm -f
 ifeq ($(DEBUG),yes)
 CFLAGS +=		-ggdb -g3
 CFLAGS +=		-DDEBUG_=1
+CFLAGS +=		-pg
 else
 CFLAGS +=		-o3
 CFLAGS +=		-DDEBUG_=0
 CFLAGS +=		-Werror
-CFLAGS +=		-pg
 endif
 
 CFLAGS += 		-Wextra -Wall
