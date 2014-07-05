@@ -21,7 +21,7 @@ static inline void		call_relative(int pid, unsigned long instruction,
     {
       call_addr = registers->rip + offset + 5;
     }
-  printf("<relative call [%lx]>\n", call_addr);
+  printf("<relative call [%lx]> {%lx}\n", call_addr, instruction);
 }
 
 static inline void		call_absolute(int pid, unsigned long instruction,

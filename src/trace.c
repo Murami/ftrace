@@ -72,6 +72,10 @@ static inline int	trace_pid(int pid)
   return (1);
 }
 
+/*
+** detacher le process !!!!!
+*/
+
 int		ftrace(t_config* config)
 {
   int	pid;
@@ -89,5 +93,10 @@ int		ftrace(t_config* config)
     pid = launch_command(config->command, config->av);
   if (pid == -1)
     return (0);
+  /*
+  ** ICI, GESTION DE LA RECHERCHE DE L'EXCUTABLE,
+  ** INITIALISATION DE LA LISTE DES SYMBOLES,
+  ** INITIALISATION DE L'ARBRE
+  */
   return (trace_pid(pid));
 }
