@@ -50,6 +50,7 @@ Elf_Scn*	get_section_by_type(Elf* elf, unsigned int type)
 ** Creer un structure par fichier elf qui contient tous les donnée pour
 ** une recherche plus rapide
 */
+
 char*		get_static_symname(Elf* elf, unsigned int symaddr)
 {
   Elf_Data*	data;
@@ -59,6 +60,8 @@ char*		get_static_symname(Elf* elf, unsigned int symaddr)
   int		i;
 
   section = get_section_by_type(elf, SHT_SYMTAB);
+  if (section == NULL)
+    printf("RAGE\n");
   gelf_getshdr(section, &shdr);
   data = elf_getdata(section, NULL);
   for (i = 0; i < shdr.sh_size / shdr.sh_entsize; i++)
