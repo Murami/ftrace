@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sat Jul  5 20:43:51 2014 vaur
+## Last update Sun Jul  6 18:21:32 2014 vaur
 ##
 
 ########################################################################
@@ -28,6 +28,7 @@ SRC=			call.c			\
 			parse_elf.c		\
 			parse_elf_read.c	\
 			parse_elf_ldconf.c	\
+			parse_map.c		\
 			ret.c			\
 			sib.c			\
 			syscall.c		\
