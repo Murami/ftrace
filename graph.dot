@@ -1,7 +1,0 @@
-digraph graphname {
-     a [label="main"][shape=box, style=filled, color=".7 .3 1.0"];
-     a -> b[label="1/1"];
-     b -> c;
-     b -> d;
-     d -> b;
- }
