@@ -1,3 +1,13 @@
+##
+## Makefile for bomberman in /home/vaur/epitech/inprogress/B-PAV-330/cpp_bomberman
+## 
+## Made by vaur
+## Login   <vaur@epitech.net>
+## 
+## Started on  Sun Jun 15 19:49:39 2014 vaur
+## Last update Sun Jul  6 17:17:21 2014 pinon
+##
+
 ########################################################################
 ##				User's  Variable
 ########################################################################
@@ -12,9 +22,12 @@ SRC=			call.c			\
 			call_rm_0x5.c		\
 			call_rm_0x9.c		\
 			call_rm_0xD.c		\
+			list.c			\
 			main.c			\
 			parse.c			\
 			parse_elf.c		\
+			parse_elf_read.c	\
+			parse_elf_ldconf.c	\
 			ret.c			\
 			sib.c			\
 			syscall.c		\
@@ -41,7 +54,7 @@ INFO=			NO
 ## 	Flags
 
 CFLAGS +=		-Iinclude
-LDFLAGS +=
+LDFLAGS +=		-lelf -L./libelf
 
 ##################
 ## Directories
