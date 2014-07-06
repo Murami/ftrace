@@ -105,7 +105,7 @@ t_list*		parse_elf(int pid)
 	  symbol->addr = sym.st_value;
 	  symbol->is_dynamic = 0;
 	  list_push_front(list, symbol);
-	  /* printf("%p -- %s\n", (void*)sym.st_value, elf_strptr(elf, shdr.sh_link, sym.st_name)); */
+	  printf("%p -- %s\n", (void*)sym.st_value, elf_strptr(elf, shdr.sh_link, sym.st_name));
 	}
     }
 
@@ -131,7 +131,7 @@ t_list*		parse_elf(int pid)
 		  symbol->addr = symval;
 		  symbol->is_dynamic = 1;
 		  list_push_front(list, symbol);
-		  /* printf("0x%lx -- %s\n", symval, elf_strptr(elf, elf_ndxscn(dynstr), sym.st_name)); */
+		  printf("0x%lx -- %s\n", symval, elf_strptr(elf, elf_ndxscn(dynstr), sym.st_name));
 		}
 	    }
 	}

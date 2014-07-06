@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 #include "ftrace.h"
+#include "parse_map.h"
+#include "map_entry.h"
 
 long int			*long_int_alloc(long int addr)
 {
@@ -75,9 +77,30 @@ void				write_file(unsigned long call_addr, t_data *data)
     }
 }
 
-static inline void		call_relative(int pid, unsigned long instruction,
-					      struct user_regs_struct* registers,
-					      t_rex* rex, t_data *data)
+inline unsigned long	call_get_symbol_value(unsigned long call_addr, t_data* data)
+{
+  t_list_iterator	it;
+  t_map_entry*		entry;
+
+  it = list_begin(data->map_info);
+  while (it != list_end(data->map_info))
+    {
+      entry = it->data;
+      printf("-");
+      if (call_addr >= entry->ptr_start &&
+	  call_addr <= entry->ptr_end)
+	{
+	  printf(">   %p -- %p -- %p = %p\n", entry->ptr_start, entry->ptr_end, call_addr, call_addr - entry->ptr_start + 0x400000);
+	  return (call_addr - entry->ptr_start + 0x400000);
+	}
+      it = list_iterator_next(it);
+    }
+  return (call_addr);
+}
+
+static inline unsigned long		call_relative(int pid, unsigned long instruction,
+						      struct user_regs_struct* registers,
+						      t_rex* rex)
 {
   unsigned long	call_addr;
   int		offset;
@@ -85,23 +108,18 @@ static inline void		call_relative(int pid, unsigned long instruction,
   _(pid);
   offset = (int)(instruction >> 8);
   if (rex->w)
-    {
-      /* WUT ? ca fait la meme chose que instruction >> 8, non ??? */
-      /* offset = ptrace(PTRACE_PEEKDATA, pid, registers->rip + 1); */
-      call_addr = registers->rip + offset + 9;
-    }
+    call_addr = registers->rip + offset + 9;
   else
-    {
-      call_addr = registers->rip + offset + 5;
-    }
-  write_file(call_addr, data);
-  list_push_front(data->call_stack, long_int_alloc(call_addr));
-  printf("<relative call [%lx]> {%lx}\n", call_addr, instruction);
+    call_addr = registers->rip + offset + 5;
+  /* write_file(call_addr, data); */
+  /* list_push_front(data->call_stack, long_int_alloc(call_addr)); */
+  /* printf("<relative call [%lx]> {%lx}\n", call_addr, instruction); */
+  return (call_addr);
 }
 
-static inline void		call_absolute(int pid, unsigned long instruction,
-					      struct user_regs_struct* registers,
-					      t_rex* rex, t_data *data)
+static inline unsigned long		call_absolute(int pid, unsigned long instruction,
+						      struct user_regs_struct* registers,
+						      t_rex* rex)
 {
   unsigned char	rm;
   unsigned long	addr;
@@ -119,15 +137,18 @@ static inline void		call_absolute(int pid, unsigned long instruction,
   else if (rm >= 0x90 && rm <= 0x97) /* four-byte signed displacement */
     addr = call_rm_0x9(pid, instruction, registers, rex, rm, &offset_rip);
 
-  write_file(addr, data);
-  list_push_front(data->call_stack, long_int_alloc(addr));
-  printf("<absolute call [%lx]>  {%lx}\n", addr, instruction);
+  /* write_file(addr, data); */
+  /* list_push_front(data->call_stack, long_int_alloc(addr)); */
+  /* printf("<absolute call [%lx]>  {%lx}\n", addr, instruction); */
+  return (addr);
 }
 
 void		call_infos(int pid, unsigned long instruction,
 			   struct user_regs_struct* registers, t_data *data)
 {
   t_rex		rex = {0, 0, 0, 0};
+  unsigned long	addr;
+  char*		name;
 
   if ((instruction & 0xF0) == 0x40)
     {
@@ -141,7 +162,19 @@ void		call_infos(int pid, unsigned long instruction,
 	return;
     }
   if ((instruction & 0x000000ff) == 0xe8)
-    call_relative(pid, instruction, registers, &rex, data);
+    addr = call_relative(pid, instruction, registers, &rex);
   if ((instruction & 0x000000ff) == 0xff && (instruction & 0x3800) == 0x1000)
-    call_absolute(pid, instruction, registers, &rex, data);
+    addr = call_absolute(pid, instruction, registers, &rex);
+  addr = call_get_symbol_value(addr, data);
+  /* printf("%lx\n", addr); */
+  name = get_call_name(addr, data);
+  if (name != NULL && strcmp(name, "main") == 0)
+    {
+      /* free l'ancien map_info */
+      data->map_info = parse_map(pid);
+    }
+  if (name != NULL)
+    printf("%s\n", name);
+  write_file(addr, data);
+  list_push_front(data->call_stack, long_int_alloc(addr));
 }

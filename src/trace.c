@@ -6,6 +6,7 @@
 #include	<sys/types.h>
 #include	<sys/wait.h>
 #include	"ftrace.h"
+#include	"parse_map.h"
 
 static inline int	launch_command(char* command, char** av)
 {
@@ -65,6 +66,8 @@ int			init_data(int pid, t_data *data)
   if ((data->link_list = list_new()) == NULL)
     return (-1);
   if ((data->sym_list = parse_elf(pid)) == NULL)
+    return (-1);
+  if ((data->map_info = parse_map(pid)) == NULL)
     return (-1);
   write(data->file, "digraph graphname {\n", 20);
   return (1);

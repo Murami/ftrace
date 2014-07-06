@@ -34,6 +34,7 @@ typedef struct	s_data
   t_list	*call_stack;
   t_list	*link_list;
   t_list	*sym_list;
+  t_list	*map_info;
 }		t_data;
 
 typedef struct	s_config

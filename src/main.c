@@ -2,9 +2,14 @@
 #include <stdio.h>
 #include "ftrace.h"
 
+void			a()
+{
+}
+
 static inline void	usage(char* command)
 {
   printf("usage: %s [-p pid] [command]\n", command);
+  a();
 }
 
 int		main(int ac, char** av)
