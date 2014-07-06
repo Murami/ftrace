@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sat Jul  5 16:28:05 2014 vaur
+## Last update Sun Jul  6 11:20:32 2014 pinon
 ##
 
 ########################################################################
@@ -29,6 +29,7 @@ SRC=			call.c			\
 			syscall.c		\
 			trace.c			\
 			trace_get_infos.c	\
+			list.c
 
 
 ##################
