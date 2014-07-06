@@ -47,7 +47,7 @@ AUTH=			devill_x	\
 ##################
 ## 	Makeflags
 
-DEBUG=			yes
+DEBUG=			no
 export DEBUG
 
 INFO=			NO
