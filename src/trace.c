@@ -100,5 +100,6 @@ int		ftrace(t_config* config)
   /*
   ** INITIALISATION DE L'ARBRE
   */
-  return (trace_pid(pid));
+  /* return (trace_pid(pid)); */
+  return (0);
 }
