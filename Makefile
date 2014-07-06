@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sun Jul  6 21:52:01 2014 vaur
+## Last update Sun Jul  6 23:30:41 2014 vaur
 ##
 
 ########################################################################
@@ -40,8 +40,9 @@ SRC=			call.c			\
 ##################
 ## 	Author
 
-AUTH=			guerot_a	\
-			devill_x	\
+AUTH=			devill_x	\
+			guerot_a	\
+			pinon_a
 
 ##################
 ## 	Makeflags
