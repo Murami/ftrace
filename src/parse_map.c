@@ -5,7 +5,7 @@
 ** Login   <vaur@epitech.net>
 **
 ** Started on  Sun Jul  6 18:14:04 2014 vaur
-** Last update Sun Jul  6 19:45:31 2014 vaur
+** Last update Sun Jul  6 23:28:02 2014 vaur
 */
 
 /*
@@ -25,9 +25,6 @@
 */
 
 #define PROC_PATH	"/proc/"
-
-
-/* #include	"map_entry.h" */
 
 /*
 ** Functions
@@ -97,7 +94,6 @@ t_list		*parse_map(int pid)
 
   map_file = get_map_name(pid);
   map_info = list_new();
-  printf("map_file: %s\n", map_file);
   if ((file_stream = fopen(map_file, "r")) == NULL)
     perror("fopen");
   else

@@ -89,9 +89,6 @@ void				write_file(unsigned long call_addr, t_data *data)
     {
       if (!link_exist(last_valid_call, call_addr, data) && get_parent(data) != 0)
 	{
-	  /* printf("parent: %lx -> %s\n", *((long*)(list_begin(data->call_stack)->data)), name_parent); */
-	  /* printf("son: %lx -> %s\n", call_addr, name_son); */
-	  printf("TEST WRITE\n");
 	  link = malloc(sizeof(t_link));
 	  link->parent = get_parent(data);
 	  link->son = call_addr;
@@ -110,7 +107,6 @@ void				write_file(unsigned long call_addr, t_data *data)
 	      write(data->file, "\"", 1);
 	    }
 	  write(data->file, "\n", strlen("\n"));
-	  printf("TEST WRITE\n");
 	}
     }
 }
@@ -124,13 +120,9 @@ inline unsigned long	call_get_symbol_value(unsigned long call_addr, t_data* data
   while (it != list_end(data->map_info))
     {
       entry = it->data;
-      printf("-");
       if (call_addr >= entry->ptr_start &&
 	  call_addr <= entry->ptr_end)
-	{
-	  printf(">   %p -- %p -- %p = %p\n", entry->ptr_start, entry->ptr_end, call_addr, call_addr - entry->ptr_start + 0x400000);
-	  return (call_addr - entry->ptr_start + 0x400000);
-	}
+	return (call_addr - entry->ptr_start + 0x400000);
       it = list_iterator_next(it);
     }
   return (call_addr);
@@ -149,9 +141,6 @@ static inline unsigned long		call_relative(int pid, unsigned long instruction,
     call_addr = registers->rip + offset + 9;
   else
     call_addr = registers->rip + offset + 5;
-  /* write_file(call_addr, data); */
-  /* list_push_front(data->call_stack, long_int_alloc(call_addr)); */
-  /* printf("<relative call [%lx]> {%lx}\n", call_addr, instruction); */
   return (call_addr);
 }
 
@@ -174,10 +163,6 @@ static inline unsigned long		call_absolute(int pid, unsigned long instruction,
     addr = call_rm_0x5(pid, instruction, registers, rex, rm, &offset_rip);
   else if (rm >= 0x90 && rm <= 0x97) /* four-byte signed displacement */
     addr = call_rm_0x9(pid, instruction, registers, rex, rm, &offset_rip);
-
-  /* write_file(addr, data); */
-  /* list_push_front(data->call_stack, long_int_alloc(addr)); */
-  /* printf("<absolute call [%lx]>  {%lx}\n", addr, instruction); */
   return (addr);
 }
 
@@ -204,15 +189,9 @@ void		call_infos(int pid, unsigned long instruction,
   if ((instruction & 0x000000ff) == 0xff && (instruction & 0x3800) == 0x1000)
     addr = call_absolute(pid, instruction, registers, &rex);
   addr = call_get_symbol_value(addr, data);
-  /* printf("%lx\n", addr); */
   name = get_call_name(addr, data);
   if (name != NULL && strcmp(name, "main") == 0)
-    {
-      /* free l'ancien map_info */
-      data->map_info = parse_map(pid);
-    }
-  if (name != NULL)
-    printf("%s\n", name);
+    data->map_info = parse_map(pid);
   write_file(addr, data);
   list_push_front(data->call_stack, get_call_entry(addr, data));
 }

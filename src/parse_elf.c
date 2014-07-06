@@ -29,8 +29,6 @@ static char	*get_prog_path(int pid)
       fprintf(stderr, "readlink \"%s\": %s\n", path_link, strerror(errno));
       exit(EXIT_FAILURE);
     }
-  /* printf("path_link: %s\n", path_link); */
-  /* printf("path: %s\n", path); */
   return (strdup(path));
 }
 
@@ -105,7 +103,6 @@ t_list*		parse_elf(int pid)
 	  symbol->addr = sym.st_value;
 	  symbol->is_dynamic = 0;
 	  list_push_front(list, symbol);
-	  printf("%p -- %s\n", (void*)sym.st_value, elf_strptr(elf, shdr.sh_link, sym.st_name));
 	}
     }
 
@@ -131,7 +128,6 @@ t_list*		parse_elf(int pid)
 		  symbol->addr = symval;
 		  symbol->is_dynamic = 1;
 		  list_push_front(list, symbol);
-		  printf("0x%lx -- %s\n", symval, elf_strptr(elf, elf_ndxscn(dynstr), sym.st_name));
 		}
 	    }
 	}
