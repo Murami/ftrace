@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sun Jul  6 17:17:21 2014 pinon
+## Last update Sun Jul  6 17:21:44 2014 pinon
 ##
 
 ########################################################################
@@ -26,14 +26,12 @@ SRC=			call.c			\
 			main.c			\
 			parse.c			\
 			parse_elf.c		\
-			parse_elf_read.c	\
 			parse_elf_ldconf.c	\
 			ret.c			\
 			sib.c			\
 			syscall.c		\
 			trace.c			\
 			trace_get_infos.c	\
-			list.c			\
 			xmalloc.c
 
 ##################
@@ -53,8 +51,10 @@ INFO=			NO
 ##################
 ## 	Flags
 
-CFLAGS +=		-Iinclude
-LDFLAGS +=		-lelf -L./libelf
+CFLAGS +=		-Iinclude			\
+			`pkg-config libelf --cflags`
+
+LDFLAGS +=		`pkg-config libelf --libs`
 
 ##################
 ## Directories

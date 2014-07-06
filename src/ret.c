@@ -9,5 +9,5 @@ void		ret_infos(int pid, unsigned long instruction,
   _(instruction);
   _(pid);
   list_pop_front(data->call_stack);
-  printf("<ret>\n");
+  /* printf("<ret>\n"); */
 }

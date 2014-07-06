@@ -11,5 +11,5 @@ void		syscall_infos(int pid, unsigned long instruction,
   _(pid);
   syscall_no = registers->rax;
   write_file(syscall_no, data);
-  printf("<syscall [%ld]>\n", syscall_no);
+  /* printf("<syscall [%ld]>\n", syscall_no); */
 }

@@ -21,11 +21,19 @@ typedef struct	s_link
   unsigned long son;
 }		t_link;
 
+typedef struct	s_symbol
+{
+  char		*name;
+  unsigned long	addr;
+  int		is_dynamic;
+}		t_symbol;
+
 typedef struct	s_data
 {
   int		file;
   t_list	*call_stack;
   t_list	*link_list;
+  t_list	*sym_list;
 }		t_data;
 
 typedef struct	s_config
@@ -71,6 +79,6 @@ unsigned long	get_sib_addr(int pid, unsigned char sib_byte,
 			     t_rex* rex, char mod);
 int		parser(t_config *config, int ac, char **av);
 void		ret_infos(int pid, unsigned long instruction, struct user_regs_struct* registers, t_data *data);
-
+t_list*		parse_elf(int pid);
 
 #endif /* FTRACE_H */

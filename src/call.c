@@ -1,6 +1,8 @@
 #include <stdio.h> /* DBG */
 #include <sys/ptrace.h>
 #include <sys/user.h>
+#include <unistd.h>
+#include <string.h>
 #include "ftrace.h"
 
 long int			*long_int_alloc(long int addr)
@@ -24,33 +26,51 @@ int				link_exist(unsigned long parent, unsigned long son, t_data *data)
 	return (1);
       it = list_iterator_next(it);
     }
-    return (0);
+  return (0);
+}
+
+char*				get_call_name(unsigned long call_addr, t_data *data)
+{
+  t_list_iterator		it;
+
+  it = list_begin(data->sym_list);
+  while (it != list_end(data->sym_list))
+    {
+      if (((t_symbol*)it->data)->addr == call_addr)
+	return (((t_symbol*)it->data)->name);
+      it = list_iterator_next(it);
+    }
+  return (NULL);
 }
 
 void				write_file(unsigned long call_addr, t_data *data)
 {
-  char		string[42];
+  char		*name_parent;
+  char		*name_son;
   t_link	*link;
 
   if (!list_empty(data->call_stack))
     {
       if (!link_exist(*((long*)(list_begin(data->call_stack)->data)), call_addr, data))
 	{
-	  link = malloc(sizeof(t_link));
-	  link->parent = *((long*)(list_begin(data->call_stack)->data));
-	  link->son = call_addr;
-	  list_push_front(data->link_list, link);
-	  sprintf(string, "\"%lx\"", *((long*)(list_begin(data->call_stack)->data)));
-	  write(data->file, string, strlen(string));
-	  write(data->file, " -> ", 4);
-	  if (call_addr < 350)
-	    write(data->file, "syscall", 7);
-	  else
+	  name_parent = get_call_name(*((long*)(list_begin(data->call_stack)->data)), data);
+	  name_son = get_call_name(call_addr, data);
+	  /* printf("parent: %lx -> %s\n", *((long*)(list_begin(data->call_stack)->data)), name_parent); */
+	  /* printf("son: %lx -> %s\n", call_addr, name_son); */
+	  if (name_parent != NULL && name_son != NULL)
 	    {
-	      sprintf(string, "\"%lx\"", call_addr);
-	      write(data->file, string, strlen(string));
+	      link = malloc(sizeof(t_link));
+	      link->parent = *((long*)(list_begin(data->call_stack)->data));
+	      link->son = call_addr;
+	      list_push_front(data->link_list, link);
+	      write(data->file, name_parent, strlen(name_parent));
+	      write(data->file, " -> ", 4);
+	      if (call_addr < 350)
+		write(data->file, "syscall", 7);
+	      else
+		write(data->file, name_son, strlen(name_son));
+	      write(data->file, "\n", strlen("\n"));
 	    }
-	  write(data->file, "\n", strlen("\n"));
 	}
     }
 }

@@ -6,7 +6,6 @@
 #include	<sys/types.h>
 #include	<sys/wait.h>
 #include	"ftrace.h"
-#include	"parse_elf.h"
 
 static inline int	launch_command(char* command, char** av)
 {
@@ -20,6 +19,9 @@ static inline int	launch_command(char* command, char** av)
       execvp(command, av);
       exit(EXIT_FAILURE);
     }
+  /* ptrace(PTRACE_SYSCALL, pid, 0, 0); */
+  /* ptrace(PTRACE_SINGLESTEP, pid, 0, 0); */
+  /* usleep(1); */
   return (pid);
 }
 
@@ -53,7 +55,7 @@ static inline void		step_infos(int pid, t_data *data)
     }
 }
 
-int			init_data(t_data *data)
+int			init_data(int pid, t_data *data)
 {
   if ((data->file = open("outfile", O_WRONLY | O_CREAT | O_TRUNC,
 			 S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
@@ -62,30 +64,26 @@ int			init_data(t_data *data)
     return (-1);
   if ((data->link_list = list_new()) == NULL)
     return (-1);
+  if ((data->sym_list = parse_elf(pid)) == NULL)
+    return (-1);
   write(data->file, "digraph graphname {\n", 20);
   return (1);
 }
 
-static inline int	trace_pid(int pid)
+static inline int	trace_pid(int pid, t_data* data)
 {
   int		status;
-  t_data	data;
 
-  if (!init_data(&data))
-    {
-      perror("error: can't init data struct");
-      return (-1);
-    }
   while (1)
     {
       waitpid(pid, &status, 0);
       if (WIFEXITED(status) ||
 	  WIFSIGNALED(status))
 	{
-	  write(data.file, "}\n", 2);
+	  write(data->file, "}\n", 2);
 	  break;
 	}
-      step_infos(pid, &data);
+      step_infos(pid, data);
       if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0) == -1)
 	{
 	  perror("error: can't trace process");
@@ -101,7 +99,8 @@ static inline int	trace_pid(int pid)
 
 int		ftrace(t_config* config)
 {
-  int	pid;
+  int		pid;
+  t_data	data;
 
   if (config->pid != -1)
     {
@@ -116,12 +115,10 @@ int		ftrace(t_config* config)
     pid = launch_command(config->command, config->av);
   if (pid == -1)
     return (0);
-
-  parse_elf(pid);
-
-  /*
-  ** INITIALISATION DE L'ARBRE
-  */
-  /* return (trace_pid(pid)); */
-  return (0);
+  if (init_data(pid, &data) == -1)
+    {
+      perror("error: can't init data struct");
+      return (0);
+    }
+  return (trace_pid(pid, &data));
 }
