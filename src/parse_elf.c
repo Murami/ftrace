@@ -15,7 +15,7 @@
 #include "list.h"
 #include "ftrace.h"
 
-# define PROC_PATH	"/proc/"
+#define PROC_PATH	"/proc/"
 
 static char	*get_prog_path(int pid)
 {
