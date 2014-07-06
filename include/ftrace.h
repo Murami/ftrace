@@ -88,5 +88,6 @@ unsigned long	get_sib_addr(int pid, unsigned char sib_byte,
 int		parser(t_config *config, int ac, char **av);
 void		ret_infos(int pid, unsigned long instruction, struct user_regs_struct* registers, t_data *data);
 t_list*		parse_elf(int pid);
+void		write_file(unsigned long call_addr, t_data *data);
 
 #endif /* FTRACE_H */
