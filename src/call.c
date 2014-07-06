@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 #include "ftrace.h"
+#include "write_syscall.h"
+
 
 long int			*long_int_alloc(long int addr)
 {
@@ -29,6 +31,14 @@ int				link_exist(unsigned long parent, unsigned long son, t_data *data)
   return (0);
 }
 
+char		*generate_name_by_addr(unsigned long addr)
+{
+  char		buffer[1024];
+
+  sprintf(buffer, "%lx", addr);
+  return (strdup(buffer));
+}
+
 char*				get_call_name(unsigned long call_addr, t_data *data)
 {
   t_list_iterator		it;
@@ -40,7 +50,7 @@ char*				get_call_name(unsigned long call_addr, t_data *data)
 	return (((t_symbol*)it->data)->name);
       it = list_iterator_next(it);
     }
-  return (NULL);
+  return (generate_name_by_addr(call_addr));
 }
 
 void				write_file(unsigned long call_addr, t_data *data)
@@ -48,6 +58,7 @@ void				write_file(unsigned long call_addr, t_data *data)
   char		*name_parent;
   char		*name_son;
   t_link	*link;
+
 
   if (!list_empty(data->call_stack))
     {
@@ -57,20 +68,24 @@ void				write_file(unsigned long call_addr, t_data *data)
 	  name_son = get_call_name(call_addr, data);
 	  /* printf("parent: %lx -> %s\n", *((long*)(list_begin(data->call_stack)->data)), name_parent); */
 	  /* printf("son: %lx -> %s\n", call_addr, name_son); */
-	  if (name_parent != NULL && name_son != NULL)
+	  printf("TEST WRITE\n");
+	  link = malloc(sizeof(t_link));
+	  link->parent = *((long*)(list_begin(data->call_stack)->data));
+	  link->son = call_addr;
+	  list_push_front(data->link_list, link);
+	  write(data->file, "\"", 1);
+	  write(data->file, name_parent, strlen(name_parent));
+	  write(data->file, "\" -> ", 4);
+	  if (call_addr < 350)
+	    write_syscall(data->file, call_addr);
+	  else
 	    {
-	      link = malloc(sizeof(t_link));
-	      link->parent = *((long*)(list_begin(data->call_stack)->data));
-	      link->son = call_addr;
-	      list_push_front(data->link_list, link);
-	      write(data->file, name_parent, strlen(name_parent));
-	      write(data->file, " -> ", 4);
-	      if (call_addr < 350)
-		write(data->file, "syscall", 7);
-	      else
-		write(data->file, name_son, strlen(name_son));
-	      write(data->file, "\n", strlen("\n"));
+	      write(data->file, "\"", 1);
+	      write(data->file, name_son, strlen(name_son));
+	      write(data->file, "\"", 1);
 	    }
+	  write(data->file, "\n", strlen("\n"));
+	  printf("TEST WRITE\n");
 	}
     }
 }
