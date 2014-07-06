@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sun Jul  6 19:01:14 2014 vaur
+## Last update Sun Jul  6 21:52:01 2014 vaur
 ##
 
 ########################################################################
@@ -31,8 +31,10 @@ SRC=			call.c			\
 			ret.c			\
 			sib.c			\
 			syscall.c		\
+			syscallent.c		\
 			trace.c			\
 			trace_get_infos.c	\
+			write_syscall.c		\
 			xmalloc.c
 
 ##################
