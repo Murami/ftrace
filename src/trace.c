@@ -1,11 +1,12 @@
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/ptrace.h>
-#include <sys/user.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include "ftrace.h"
+#include	<unistd.h>
+#include	<stdlib.h>
+#include	<stdio.h>
+#include	<sys/ptrace.h>
+#include	<sys/user.h>
+#include	<sys/types.h>
+#include	<sys/wait.h>
+#include	"ftrace.h"
+#include	"parse_elf.h"
 
 static inline int	launch_command(char* command, char** av)
 {
@@ -115,10 +116,12 @@ int		ftrace(t_config* config)
     pid = launch_command(config->command, config->av);
   if (pid == -1)
     return (0);
+
+  parse_elf(pid);
+
   /*
-  ** ICI, GESTION DE LA RECHERCHE DE L'EXCUTABLE,
-  ** INITIALISATION DE LA LISTE DES SYMBOLES,
   ** INITIALISATION DE L'ARBRE
   */
-  return (trace_pid(pid));
+  /* return (trace_pid(pid)); */
+  return (0);
 }
