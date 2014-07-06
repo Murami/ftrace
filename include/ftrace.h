@@ -19,7 +19,14 @@ typedef struct	s_link
 {
   unsigned long parent;
   unsigned long son;
+  bool		valid_call;
 }		t_link;
+
+typedef struct	s_stack_entry
+{
+  unsigned long	addr;
+  bool		valid_call;
+}		t_stack_entry;
 
 typedef struct	s_symbol
 {

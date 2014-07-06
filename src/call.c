@@ -7,36 +7,17 @@
 #include "parse_map.h"
 #include "map_entry.h"
 #include "write_syscall.h"
+#include "xfcts.h"
 
-long int			*long_int_alloc(long int addr)
-{
-  long int *ret;
-
-  ret = malloc(sizeof(long int));
-  *ret = addr;
-  return (ret);
-}
-
-int				link_exist(unsigned long parent, unsigned long son, t_data *data)
-{
-  t_list_iterator it;
+long	last_valid_call = 0;
 
 
-  it = list_begin(data->link_list);
-  while (it != list_end(data->link_list))
-    {
-      if (((t_link*)it->data)->parent == parent && ((t_link*)it->data)->son == son)
-	return (1);
-      it = list_iterator_next(it);
-    }
-  return (0);
-}
 
 char		*generate_name_by_addr(unsigned long addr)
 {
   char		buffer[1024];
 
-  sprintf(buffer, "%lx", addr);
+  sprintf(buffer, "0x%lx", addr);
   return (strdup(buffer));
 }
 
@@ -54,25 +35,68 @@ char*				get_call_name(unsigned long call_addr, t_data *data)
   return (generate_name_by_addr(call_addr));
 }
 
+t_stack_entry	*get_call_entry(long int addr, t_data *data)
+{
+  t_stack_entry	*entry;
+
+  entry = xmalloc(sizeof(*entry));
+  entry->addr = addr;
+  if (strncmp("0x", get_call_name(addr, data), 2) == 0)
+    entry->valid_call = false;
+  else
+    entry->valid_call = true;
+  return (entry);
+}
+
+int				link_exist(unsigned long parent, unsigned long son, t_data *data)
+{
+  t_list_iterator it;
+
+
+  it = list_begin(data->link_list);
+  while (it != list_end(data->link_list))
+    {
+      if (((t_link*)it->data)->parent == parent && ((t_link*)it->data)->son == son)
+	return (1);
+      it = list_iterator_next(it);
+    }
+  return (0);
+}
+
+unsigned long		get_parent(t_data *data)
+{
+  t_list_iterator	it_list;
+  t_stack_entry		*entry;
+
+  it_list = list_begin(data->call_stack);
+  while (it_list != list_end(data->call_stack))
+    {
+      entry = it_list->data;
+      if (entry->valid_call == true)
+	return (entry->addr);
+      it_list = list_iterator_next(it_list);
+    }
+  return (0);
+}
+
 void				write_file(unsigned long call_addr, t_data *data)
 {
   char		*name_parent;
   char		*name_son;
   t_link	*link;
 
-
   if (!list_empty(data->call_stack))
     {
-      if (!link_exist(*((long*)(list_begin(data->call_stack)->data)), call_addr, data))
+      if (!link_exist(last_valid_call, call_addr, data) && get_parent(data) != 0)
 	{
-	  name_parent = get_call_name(*((long*)(list_begin(data->call_stack)->data)), data);
-	  name_son = get_call_name(call_addr, data);
 	  /* printf("parent: %lx -> %s\n", *((long*)(list_begin(data->call_stack)->data)), name_parent); */
 	  /* printf("son: %lx -> %s\n", call_addr, name_son); */
 	  printf("TEST WRITE\n");
 	  link = malloc(sizeof(t_link));
-	  link->parent = *((long*)(list_begin(data->call_stack)->data));
+	  link->parent = get_parent(data);
 	  link->son = call_addr;
+	  name_parent = get_call_name(link->parent, data);
+	  name_son    = get_call_name(link->son, data);
 	  list_push_front(data->link_list, link);
 	  write(data->file, "\"", 1);
 	  write(data->file, name_parent, strlen(name_parent));
@@ -190,5 +214,5 @@ void		call_infos(int pid, unsigned long instruction,
   if (name != NULL)
     printf("%s\n", name);
   write_file(addr, data);
-  list_push_front(data->call_stack, long_int_alloc(addr));
+  list_push_front(data->call_stack, get_call_entry(addr, data));
 }
