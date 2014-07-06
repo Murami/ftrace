@@ -7,7 +7,34 @@
 #define CALL		2
 #define RET		3
 
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "list.h"
+
 struct user_regs_struct;
+
+typedef struct	s_link
+{
+  unsigned long parent;
+  unsigned long son;
+}		t_link;
+
+typedef struct	s_symbol
+{
+  char		*name;
+  unsigned long	addr;
+  int		is_dynamic;
+}		t_symbol;
+
+typedef struct	s_data
+{
+  int		file;
+  t_list	*call_stack;
+  t_list	*link_list;
+  t_list	*sym_list;
+}		t_data;
 
 typedef struct	s_config
 {
@@ -37,8 +64,8 @@ long		get_data(int pid, long addr);
 int		get_registers(int pid, struct user_regs_struct* registers);
 long		get_instruction(int pid, struct user_regs_struct* registers);
 int		get_instruction_type(long instr);
-void		syscall_infos(int pid, unsigned long instruction, struct user_regs_struct* registers);
-void		call_infos(int pid, unsigned long instruction, struct user_regs_struct* registers);
+void		syscall_infos(int pid, unsigned long instruction, struct user_regs_struct* registers, t_data *data);
+void		call_infos(int pid, unsigned long instruction, struct user_regs_struct* registers, t_data *data);
 unsigned long	call_rm_0x1(int pid, unsigned long instruction, struct user_regs_struct* registers,
 			    t_rex* rex, unsigned char rm, int* offset_rip);
 unsigned long	call_rm_0x5(int pid, unsigned long instruction, struct user_regs_struct* registers,
@@ -51,7 +78,7 @@ unsigned long	get_sib_addr(int pid, unsigned char sib_byte,
 			     struct user_regs_struct* registers,
 			     t_rex* rex, char mod);
 int		parser(t_config *config, int ac, char **av);
-void		ret_infos(int pid, unsigned long instruction, struct user_regs_struct* registers);
-
+void		ret_infos(int pid, unsigned long instruction, struct user_regs_struct* registers, t_data *data);
+t_list*		parse_elf(int pid);
 
 #endif /* FTRACE_H */

@@ -5,7 +5,7 @@
 ## Login   <vaur@epitech.net>
 ## 
 ## Started on  Sun Jun 15 19:49:39 2014 vaur
-## Last update Sun Jul  6 18:21:32 2014 vaur
+## Last update Sun Jul  6 19:01:14 2014 vaur
 ##
 
 ########################################################################
@@ -26,7 +26,6 @@ SRC=			call.c			\
 			main.c			\
 			parse.c			\
 			parse_elf.c		\
-			parse_elf_read.c	\
 			parse_elf_ldconf.c	\
 			parse_map.c		\
 			ret.c			\
@@ -53,8 +52,10 @@ INFO=			NO
 ##################
 ## 	Flags
 
-CFLAGS +=		-Iinclude
-LDFLAGS +=		-lelf -L./libelf
+CFLAGS +=		-Iinclude			\
+			`pkg-config libelf --cflags`
+
+LDFLAGS +=		`pkg-config libelf --libs`
 
 ##################
 ## Directories

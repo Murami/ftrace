@@ -52,6 +52,8 @@ void		list_pop_back(t_list* this)
 {
   t_list_elm*	elm;
 
+  if (!this->size)
+    return;
   elm = (t_list_elm*)this->root->prev;
   elm->prev->next = this->root;
   this->root->prev = elm->prev;
@@ -63,6 +65,8 @@ void	list_pop_front(t_list* this)
 {
   t_list_elm*	elm;
 
+  if (!this->size)
+    return;
   elm = (t_list_elm*)this->root->prev;
   elm->prev->next = this->root;
   this->root->prev = elm->prev;
